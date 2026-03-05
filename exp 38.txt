@@ -1,0 +1,108 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void sort(int arr[], int n) {
+    // Simple bubble sort
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - 1 - i; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int tmp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = tmp;
+            }
+        }
+    }
+}
+
+int main() {
+    int size, i;
+    int head, disk_size, direction;
+    int total_movement = 0;
+
+    printf("Enter number of disk requests: ");
+    scanf("%d", &size);
+
+    int requests[size];
+
+    printf("Enter the disk requests:\n");
+    for (i = 0; i < size; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    printf("Enter current head position: ");
+    scanf("%d", &head);
+
+    printf("Enter total disk size (last cylinder number): ");
+    scanf("%d", &disk_size);
+
+    printf("Enter direction (0 for left, 1 for right): ");
+    scanf("%d", &direction);
+
+    sort(requests, size);
+
+    printf("\nSCAN Disk Scheduling Order:\n");
+
+    if (direction == 1) { // Moving right
+        // First service requests to the right of head
+        for (i = 0; i < size; i++) {
+            if (requests[i] >= head) {
+                break;
+            }
+        }
+
+        int start = i;
+
+        for (i = start; i < size; i++) {
+            printf("%d ", requests[i]);
+            total_movement += abs(head - requests[i]);
+            head = requests[i];
+        }
+
+        // Move to end of disk
+        if (head != disk_size - 1) {
+            total_movement += abs(disk_size - 1 - head);
+            head = disk_size - 1;
+        }
+
+        // Then service requests to the left
+        for (i = start - 1; i >= 0; i--) {
+            printf("%d ", requests[i]);
+            total_movement += abs(head - requests[i]);
+            head = requests[i];
+        }
+
+    } else { // Moving left
+        // First service requests to the left of head
+        for (i = size - 1; i >= 0; i--) {
+            if (requests[i] <= head) {
+                break;
+            }
+        }
+
+        int start = i;
+
+        for (i = start; i >= 0; i--) {
+            printf("%d ", requests[i]);
+            total_movement += abs(head - requests[i]);
+            head = requests[i];
+        }
+
+        // Move to beginning of disk
+        if (head != 0) {
+            total_movement += abs(head - 0);
+            head = 0;
+        }
+
+        // Then service requests to the right
+        for (i = start + 1; i < size; i++) {
+            printf("%d ", requests[i]);
+            total_movement += abs(head - requests[i]);
+            head = requests[i];
+        }
+    }
+
+    printf("\nTotal head movement: %d\n", total_movement);
+
+    return 0;
+}

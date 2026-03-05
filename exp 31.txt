@@ -1,0 +1,56 @@
+
+#include <stdio.h>
+#include <stdbool.h>
+
+bool isInFrames(int frames[], int n, int page) {
+    for (int i = 0; i < n; i++) {
+        if (frames[i] == page)
+            return true;
+    }
+    return false;
+}
+
+int main() {
+    int n, m;
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+
+    int pages[n];
+    printf("Enter page reference string:\n");
+    for (int i = 0; i < n; i++)
+        scanf("%d", &pages[i]);
+
+    printf("Enter number of frames: ");
+    scanf("%d", &m);
+
+    int frames[m];
+    for (int i = 0; i < m; i++)
+        frames[i] = -1;
+
+    int page_faults = 0;
+    int front = 0;  // points to the oldest page to be replaced
+
+    printf("\nPage replacement process:\n");
+
+    for (int i = 0; i < n; i++) {
+        if (!isInFrames(frames, m, pages[i])) {
+            // Page fault
+            frames[front] = pages[i];
+            front = (front + 1) % m;
+            page_faults++;
+        }
+
+        printf("After accessing page %d: ", pages[i]);
+        for (int j = 0; j < m; j++) {
+            if (frames[j] != -1)
+                printf("%d ", frames[j]);
+            else
+                printf("- ");
+        }
+        printf("\n");
+    }
+
+    printf("\nTotal Page Faults = %d\n", page_faults);
+
+    return 0;
+}

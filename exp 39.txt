@@ -1,0 +1,84 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+void sort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                // swap
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int main() {
+    int size, i, j;
+    int head, disk_size;
+    int total_movement = 0;
+
+    printf("Enter number of disk requests: ");
+    scanf("%d", &size);
+
+    int requests[size + 1]; // extra slot for head
+
+    printf("Enter disk requests (in cylinder numbers):\n");
+    for (i = 0; i < size; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    printf("Enter current head position: ");
+    scanf("%d", &head);
+
+    printf("Enter total disk size (last cylinder number): ");
+    scanf("%d", &disk_size);
+
+    requests[size] = head;  // include head in request list
+    size++;
+
+    sort(requests, size);
+
+    // Find head index
+    int head_index = 0;
+    for (i = 0; i < size; i++) {
+        if (requests[i] == head) {
+            head_index = i;
+            break;
+        }
+    }
+
+    printf("\nC-SCAN Disk Scheduling Order:\n");
+
+    // Service requests to the right of head
+    for (i = head_index; i < size; i++) {
+        printf("%d ", requests[i]);
+        if (i != head_index)
+            total_movement += abs(requests[i] - requests[i - 1]);
+    }
+
+    // Move to end of disk
+    if (requests[size - 1] != disk_size - 1) {
+        total_movement += abs((disk_size - 1) - requests[size - 1]);
+        printf("%d ", disk_size - 1); // move to end
+    }
+
+    // Jump to beginning (cylinder 0)
+    total_movement += (disk_size - 1); // jump from end to start
+    printf("0 ");
+
+    // Service remaining requests on left side
+    for (i = 0; i < head_index; i++) {
+        printf("%d ", requests[i]);
+        if (i == 0)
+            total_movement += abs(requests[i] - 0);
+        else
+            total_movement += abs(requests[i] - requests[i - 1]);
+    }
+
+    printf("\nTotal head movement: %d\n", total_movement);
+
+    return 0;
+}

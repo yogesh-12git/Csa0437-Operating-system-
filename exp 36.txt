@@ -1,0 +1,121 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_BLOCKS 100
+
+typedef struct Block {
+    int data;
+    int next;
+} Block;
+
+typedef struct File {
+    char name[20];
+    int start;
+    int end;
+} File;
+
+Block disk[MAX_BLOCKS];     // Simulated disk blocks
+int freeBlock[MAX_BLOCKS];  // 0 = free, 1 = allocated
+
+File files[10];
+int fileCount = 0;
+
+int allocate_block() {
+    for (int i = 0; i < MAX_BLOCKS; i++) {
+        if (!freeBlock[i]) {
+            freeBlock[i] = 1;
+            return i;
+        }
+    }
+    return -1; // No free block
+}
+
+void create_file() {
+    char fname[20];
+    int size;
+
+    printf("Enter file name: ");
+    scanf("%s", fname);
+
+    printf("Enter number of blocks needed: ");
+    scanf("%d", &size);
+
+    if (size <= 0 || size > MAX_BLOCKS) {
+        printf("Invalid size.\n");
+        return;
+    }
+
+    int prev = -1, start = -1;
+    for (int i = 0; i < size; i++) {
+        int block = allocate_block();
+        if (block == -1) {
+            printf("Disk full! Could not allocate all blocks.\n");
+            return;
+        }
+
+        if (start == -1) start = block;
+
+        if (prev != -1) {
+            disk[prev].next = block;
+        }
+
+        disk[block].data = block;
+        disk[block].next = -1;
+
+        prev = block;
+    }
+
+    strcpy(files[fileCount].name, fname);
+    files[fileCount].start = start;
+    files[fileCount].end = prev;
+    fileCount++;
+
+    printf("File '%s' created successfully.\n", fname);
+}
+
+void display_files() {
+    if (fileCount == 0) {
+        printf("No files created yet.\n");
+        return;
+    }
+
+    for (int i = 0; i < fileCount; i++) {
+        printf("\nFile: %s\nBlocks: ", files[i].name);
+        int block = files[i].start;
+        while (block != -1) {
+            printf("%d -> ", block);
+            block = disk[block].next;
+        }
+        printf("NULL\n");
+    }
+}
+
+int main() {
+    int choice;
+
+    while (1) {
+        printf("\n--- Linked Allocation Simulation ---\n");
+        printf("1. Create File\n");
+        printf("2. Display Files\n");
+        printf("3. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                create_file();
+                break;
+            case 2:
+                display_files();
+                break;
+            case 3:
+                exit(0);
+            default:
+                printf("Invalid choice.\n");
+        }
+    }
+
+    return 0;
+}

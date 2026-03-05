@@ -1,0 +1,85 @@
+
+#include <stdio.h>
+#include <stdbool.h>
+
+int findLRU(int time[], int n) {
+    int i, minimum = time[0], pos = 0;
+    for (i = 1; i < n; i++) {
+        if (time[i] < minimum) {
+            minimum = time[i];
+            pos = i;
+        }
+    }
+    return pos;
+}
+
+bool isInFrames(int frames[], int n, int page) {
+    for (int i = 0; i < n; i++) {
+        if (frames[i] == page)
+            return true;
+    }
+    return false;
+}
+
+int main() {
+    int n, m;
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+
+    int pages[n];
+    printf("Enter page reference string:\n");
+    for (int i = 0; i < n; i++)
+        scanf("%d", &pages[i]);
+
+    printf("Enter number of frames: ");
+    scanf("%d", &m);
+
+    int frames[m];
+    int time[m];  // To store last used time of frames
+    int count = 0, page_faults = 0;
+
+    for (int i = 0; i < m; i++) {
+        frames[i] = -1;
+        time[i] = 0;
+    }
+
+    printf("\nPage replacement process:\n");
+
+    for (int i = 0; i < n; i++) {
+        if (!isInFrames(frames, m, pages[i])) {
+            // Page fault occurs
+            page_faults++;
+
+            if (count < m) {
+                frames[count] = pages[i];
+                time[count] = i;
+                count++;
+            } else {
+                int lru = findLRU(time, m);
+                frames[lru] = pages[i];
+                time[lru] = i;
+            }
+        } else {
+            // Update time for recently used page
+            for (int j = 0; j < m; j++) {
+                if (frames[j] == pages[i]) {
+                    time[j] = i;
+                    break;
+                }
+            }
+        }
+
+        printf("After accessing page %d: ", pages[i]);
+        for (int j = 0; j < m; j++) {
+            if (frames[j] != -1)
+                printf("%d ", frames[j]);
+            else
+                printf("- ");
+        }
+        printf("\n");
+    }
+
+    printf("\nTotal Page Faults = %d\n", page_faults);
+
+    return 0;
+}

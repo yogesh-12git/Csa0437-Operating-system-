@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    char dir[100][50], file[50];
+    int n = 0, ch;
+
+    while (1) {
+        printf("\n1.Create 2.Delete 3.Display 4.Exit: ");
+        scanf("%d", &ch);
+
+        if (ch == 1) {
+            printf("Enter file name: ");
+            scanf("%s", file);
+            for (int i = 0; i < n; i++)
+                if (strcmp(dir[i], file) == 0) { printf("Exists!\n"); goto end; }
+            strcpy(dir[n++], file);
+            printf("File created.\n");
+        } 
+        else if (ch == 2) {
+            printf("Enter file name: ");
+            scanf("%s", file);
+            for (int i = 0; i < n; i++) {
+                if (strcmp(dir[i], file) == 0) {
+                    for (int j = i; j < n - 1; j++) strcpy(dir[j], dir[j + 1]);
+                    n--; printf("File deleted.\n"); goto end;
+                }
+            }
+            printf("Not found.\n");
+        } 
+        else if (ch == 3) {
+            if (n == 0) printf("Empty.\n");
+            else for (int i = 0; i < n; i++) printf("%s\n", dir[i]);
+      } 
+        else if (ch == 4) break;
+        else printf("Invalid.\n");
+        end:;
+    }
+    return 0;
+}
