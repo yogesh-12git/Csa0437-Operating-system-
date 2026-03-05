@@ -1,0 +1,43 @@
+#include <stdio.h>
+
+int main() {
+    int n, f, i, j = 0, faults = 0;
+
+    printf("Number of Pages: ");
+    scanf("%d", &n);
+    int pages[n];
+
+    printf("Enter Page Reference String: ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &pages[i]);
+
+    printf("Number of Frames: ");
+    scanf("%d", &f);
+    int frame[f];
+
+    // Initialize all frames to -1
+    for (i = 0; i < f; i++)
+        frame[i] = -1;
+
+    for (i = 0; i < n; i++) {
+        int hit = 0;
+
+        // Check for page hit
+        for (int k = 0; k < f; k++) {
+            if (frame[k] == pages[i]) {
+                hit = 1;
+                break;
+            }
+        }
+
+        // If not hit, it's a fault: replace using FIFO
+        if (!hit) {
+            frame[j] = pages[i];
+            j = (j + 1) % f;
+            faults++;
+        }
+    }
+
+    printf("Total Page Faults = %d\n", faults);
+    return 0;
+}

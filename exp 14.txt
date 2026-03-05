@@ -1,0 +1,37 @@
+#include <stdio.h>
+
+int findFarthest(int pages[], int frames[], int size, int index, int n) {
+    int pos = -1, farthest = -1;
+    for (int i = 0; i < n; i++) {
+        int j;
+        for (j = index; j < size; j++) {
+            if (frames[i] == pages[j]) {
+                if (j > farthest) { farthest = j; pos = i; }
+                break;
+            }
+        }
+        if (j == size) return i;
+    }
+    return pos;
+}
+
+void optimal(int pages[], int size, int n) {
+    int frames[n], faults = 0;
+    for (int i = 0; i < n; i++) frames[i] = -1;
+
+    for (int i = 0; i < size; i++) {
+        int found = 0;
+        for (int j = 0; j < n; j++) if (frames[j] == pages[i]) { found = 1; break; }
+        if (!found) {
+            frames[findFarthest(pages, frames, size, i + 1, n)] = pages[i];
+            faults++;
+        }
+    }
+    printf("Page Faults: %d\n", faults);
+}
+
+int main() {
+    int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3};
+    optimal(pages, 12, 3);
+    return 0;
+}
